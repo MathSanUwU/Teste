@@ -31,6 +31,7 @@
         async function fetchVagas() {
             const response = await fetch('/api/votes');
             const data = await response.json();
+            console.log("Vagas:", data); // Log para verificar as vagas retornadas
             teamLimits = data; // Atualiza o número de vagas de cada time
         }
 
@@ -59,6 +60,8 @@
             assignedTeams[name] = team;
             teamCounts[team]++;
 
+            console.log("Voto enviado para o time:", team); // Log para verificar o time sorteado
+
             // Envia o voto para a API
             const response = await fetch('/api/votes', {
                 method: 'POST',
@@ -69,6 +72,8 @@
             });
 
             const result = await response.json();
+            console.log("Resposta da API:", result); // Log para verificar a resposta da API
+
             if (result.message === "Voto registrado") {
                 localStorage.setItem("assignedTeam", team);
                 document.getElementById("result").innerText = "Seu time: " + team;
