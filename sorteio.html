@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorteio de Times</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
+        #result { margin-top: 20px; font-size: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h2>Digite seu nome para saber seu time</h2>
+    <input type="text" id="nameInput" placeholder="Seu nome">
+    <button onclick="assignTeam()">Sortear Time</button>
+    <p id="result"></p>
+
+    <script>
+        let assignedTeams = {};
+        let teams = ["Caos", "Ordem"];
+        let teamLimits = { "Caos": 7, "Ordem": 7 };
+        let teamCounts = { "Caos": 0, "Ordem": 0 };
+
+        // Verifica se o usuário já sorteou um time
+        if (localStorage.getItem("assignedTeam")) {
+            document.getElementById("result").innerText = "Seu time: " + localStorage.getItem("assignedTeam");
+            document.getElementById("nameInput").disabled = true;
+            document.querySelector("button").disabled = true;
+        }
+
+        function assignTeam() {
+            let name = document.getElementById("nameInput").value.trim();
+            if (name === "") {
+                alert("Por favor, insira um nome.");
+                return;
+            }
+
+            if (localStorage.getItem("assignedTeam")) {
+                alert("Você já sorteou um time.");
+                return;
+            }
+
+            let availableTeams = teams.filter(team => teamCounts[team] < teamLimits[team]);
+
+            if (availableTeams.length === 0) {
+                document.getElementById("result").innerText = "Os times já estão completos!";
+                return;
+            }
+
+            let team = availableTeams[Math.floor(Math.random() * availableTeams.length)];
+            assignedTeams[name] = team;
+            teamCounts[team]++;
+
+            localStorage.setItem("assignedTeam", team);
+
+            document.getElementById("result").innerText = "Seu time: " + team;
+            document.getElementById("nameInput").disabled = true;
+            document.querySelector("button").disabled = true;
+        }
+    </script>
+</body>
+</html>
