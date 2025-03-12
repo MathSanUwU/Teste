@@ -28,7 +28,13 @@
             document.querySelector("button").disabled = true;
         }
 
-        function assignTeam() {
+        async function fetchVagas() {
+            const response = await fetch('/api/votes');
+            const data = await response.json();
+            teamLimits = data; // Atualiza o número de vagas de cada time
+        }
+
+        async function assignTeam() {
             let name = document.getElementById("nameInput").value.trim();
             if (name === "") {
                 alert("Por favor, insira um nome.");
@@ -39,6 +45,8 @@
                 alert("Você já sorteou um time.");
                 return;
             }
+
+            await fetchVagas();  // Atualiza as vagas antes de sorteio
 
             let availableTeams = teams.filter(team => teamCounts[team] < teamLimits[team]);
 
@@ -51,11 +59,24 @@
             assignedTeams[name] = team;
             teamCounts[team]++;
 
-            localStorage.setItem("assignedTeam", team);
+            // Envia o voto para a API
+            const response = await fetch('/api/votes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ team: team })
+            });
 
-            document.getElementById("result").innerText = "Seu time: " + team;
-            document.getElementById("nameInput").disabled = true;
-            document.querySelector("button").disabled = true;
+            const result = await response.json();
+            if (result.message === "Voto registrado") {
+                localStorage.setItem("assignedTeam", team);
+                document.getElementById("result").innerText = "Seu time: " + team;
+                document.getElementById("nameInput").disabled = true;
+                document.querySelector("button").disabled = true;
+            } else {
+                alert(result.message);
+            }
         }
     </script>
 </body>
